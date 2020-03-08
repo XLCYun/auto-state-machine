@@ -1,6 +1,6 @@
 {
   "name": "auto-state-machine",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A finite state machine that supports transiting state automatically.",
   "main": "./dist/index.js",
   "dependencies": {
