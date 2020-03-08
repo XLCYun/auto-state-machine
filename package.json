@@ -1,10 +1,10 @@
 {
   "name": "auto-state-machine",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A finite state machine that supports transiting state automatically.",
   "main": "./dist/index.js",
   "dependencies": {
-    "@xlcyun/event-man": "^0.2.6"
+    "@xlcyun/event-man": "^0.2.7"
   },
   "devDependencies": {
     "@types/chai": "^4.2.10",

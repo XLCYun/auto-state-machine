@@ -1449,3 +1449,76 @@ describe("isPending", function () {
         chai_1.expect(asm.isPending).to.be.false;
     });
 });
+it("`this` of the hook functions will bind to the auth-state-machine instance", function () {
+    let check = {
+        before: false,
+        beforeAToB: false,
+        leaveA: false,
+        leave: false,
+        enter: false,
+        enterB: false,
+        afterAToB: false,
+        after: false,
+        condition: false
+    };
+    let asm = new __1.default({
+        state: "A",
+        before: function () {
+            check.before = this === asm;
+        },
+        after: function () {
+            check.after = this === asm;
+        },
+        enter: function () {
+            check.enter = this === asm;
+        },
+        leave: function () {
+            check.leave = this === asm;
+        },
+        graph: [
+            {
+                state: "A",
+                enter: function () {
+                    throw new Error("A->B, A's enter hoook will not be executed");
+                },
+                leave: function () {
+                    check.leaveA = this === asm;
+                },
+                to: [
+                    {
+                        state: "B",
+                        before: function () {
+                            check.beforeAToB = this === asm;
+                        },
+                        after: function () {
+                            check.afterAToB = this === asm;
+                        },
+                        condition: function () {
+                            check.condition = this === asm;
+                            return true;
+                        }
+                    }
+                ]
+            },
+            {
+                state: "B",
+                to: [],
+                enter: function () {
+                    check.enterB = this === asm;
+                }
+            }
+        ]
+    });
+    asm.goTo("B", false);
+    chai_1.expect(check).to.deep.equal({
+        before: true,
+        beforeAToB: true,
+        leaveA: true,
+        leave: true,
+        enter: true,
+        enterB: true,
+        afterAToB: true,
+        after: true,
+        condition: true
+    });
+});

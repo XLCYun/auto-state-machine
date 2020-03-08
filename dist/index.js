@@ -48,9 +48,11 @@ class AutoStateMachine {
     //   throw e
     // }
     polyfillASMConfig(config) {
+        let event = config.event || new EventMan();
+        event.thisArg = this;
         return {
             state: config.state,
-            event: config.event || new EventMan(),
+            event: event,
             before: config.before || this.defaultBefore,
             after: config.after || this.defaultAfter,
             enter: config.enter || this.defaultEnter,
@@ -176,7 +178,7 @@ class AutoStateMachine {
             }
         if (tran === null)
             return false;
-        let conditionResult = tran.condition();
+        let conditionResult = tran.condition.call(this);
         if (isPromise(conditionResult)) {
             return new Promise(function (resolve, reject) {
                 conditionResult.then((condition) => resolve(condition === true)).catch(reject);
@@ -277,7 +279,7 @@ class AutoStateMachine {
         if (testTrans.length <= 0)
             return false;
         let tran = testTrans.shift();
-        let res = tran.condition();
+        let res = tran.condition.call(this);
         if (isPromise(res))
             return new Promise((resolve, reject) => res
                 .then((condition) => resolve(condition === true ? this.goTo(tran.state, true) : this._step(testTrans)))

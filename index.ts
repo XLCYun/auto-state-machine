@@ -1,7 +1,7 @@
 import EventMan = require("@xlcyun/event-man")
-import PromiseOrphanage = require("@xlcyun/event-man/PromiseOrphanage")
 
-export type AnyFunction<ArgumentArrayType extends any[] = any, ReturnType = any> = (
+type AnyFunction<ThisType = any, ArgumentArrayType extends any[] = any, ReturnType = any> = (
+  this: ThisType,
   ...args: ArgumentArrayType
 ) => ReturnType
 
@@ -120,9 +120,11 @@ export class AutoStateMachine {
   //   throw e
   // }
   private polyfillASMConfig(config: ASMConfig): _ASMConfig {
+    let event = config.event || new EventMan()
+    event.thisArg = this
     return {
       state: config.state,
-      event: config.event || new EventMan(),
+      event: event,
       before: config.before || this.defaultBefore,
       after: config.after || this.defaultAfter,
       enter: config.enter || this.defaultEnter,
@@ -253,7 +255,7 @@ export class AutoStateMachine {
       }
     if (tran === null) return false
 
-    let conditionResult = tran.condition()
+    let conditionResult = tran.condition.call(this)
     if (isPromise(conditionResult)) {
       return new Promise(function(resolve, reject) {
         conditionResult.then((condition: any) => resolve(condition === true)).catch(reject)
@@ -350,7 +352,7 @@ export class AutoStateMachine {
   private _step(testTrans: _Transition[]): boolean | Promise<boolean> {
     if (testTrans.length <= 0) return false
     let tran = testTrans.shift() as _Transition
-    let res = tran.condition()
+    let res = tran.condition.call(this)
     if (isPromise(res))
       return new Promise((resolve, reject) =>
         res

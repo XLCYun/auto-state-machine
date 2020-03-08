@@ -1,5 +1,5 @@
 import EventMan = require("@xlcyun/event-man");
-export declare type AnyFunction<ArgumentArrayType extends any[] = any, ReturnType = any> = (...args: ArgumentArrayType) => ReturnType;
+declare type AnyFunction<ThisType = any, ArgumentArrayType extends any[] = any, ReturnType = any> = (this: ThisType, ...args: ArgumentArrayType) => ReturnType;
 export interface ASMConfig {
     state: string;
     event?: EventMan;
